@@ -1,0 +1,10 @@
+{
+  "name": "PulsePause",
+  "description": "Camera-based human-sensing wellness and focus companion powered by Presage SmartSpectra SDK.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

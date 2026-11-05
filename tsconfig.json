@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "types": ["vite/client", "vite-plugin-pwa/client"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./*"],
+      "@pulsepause/domain-models": ["./packages/domain-models/src/index.ts"],
+      "@pulsepause/shared-contracts": ["./packages/shared-contracts/src/index.ts"],
+      "@pulsepause/design-system": ["./packages/design-system/src/index.ts"],
+      "@web/*": ["./apps/web/src/*"]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "exclude": ["dist", "apps/desktop", "apps/android"]
+}

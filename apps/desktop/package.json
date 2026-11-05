@@ -1,0 +1,21 @@
+{
+  "name": "pulsepause-desktop",
+  "version": "1.0.0",
+  "description": "PulsePause Desktop Companion with native Presage SmartSpectra SDK optical sensing",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@pulsepause/domain-models": "*",
+    "@pulsepause/shared-contracts": "*",
+    "@pulsepause/design-system": "*",
+    "@smartspectra/node-sdk": "^3.4.0"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "typescript": "^5.7.0"
+  },
+  "private": true
+}

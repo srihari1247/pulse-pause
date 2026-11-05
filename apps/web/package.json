@@ -1,0 +1,11 @@
+{
+  "name": "pulsepause-web",
+  "version": "1.0.0",
+  "description": "PulsePause Responsive Web Application Shell & Companion Dashboard",
+  "private": true,
+  "dependencies": {
+    "@pulsepause/domain-models": "*",
+    "@pulsepause/shared-contracts": "*",
+    "@pulsepause/design-system": "*"
+  }
+}

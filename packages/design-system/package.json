@@ -1,0 +1,8 @@
+{
+  "name": "@pulsepause/design-system",
+  "version": "1.0.0",
+  "description": "Design tokens, color palettes and wellness themes for PulsePause",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true
+}
