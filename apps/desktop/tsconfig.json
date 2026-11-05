@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@pulsepause/domain-models": ["../../packages/domain-models/src"],
-      "@pulsepause/shared-contracts": ["../../packages/shared-contracts/src"],
-      "@pulsepause/design-system": ["../../packages/design-system/src"]
+      "@pulsepause/domain-models": ["../../packages/domain-models/src/index.ts"],
+      "@pulsepause/shared-contracts": ["../../packages/shared-contracts/src/index.ts"],
+      "@pulsepause/design-system": ["../../packages/design-system/src/index.ts"]
     }
   },
   "include": ["src/**/*"]

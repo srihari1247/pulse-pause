@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "dev:web": "vite --port=3000 --host=0.0.0.0",
-    "dev:desktop": "electron apps/desktop",
+    "dev:desktop": "npm run build:desktop && electron apps/desktop",
     "build": "vite build",
     "build:web": "vite build",
-    "build:desktop": "tsc -p apps/desktop",
+    "build:desktop": "esbuild apps/desktop/src/main/main.ts --bundle --platform=node --target=node20 --outfile=apps/desktop/dist/main/main.js --external:electron --external:@smartspectra/node-sdk && esbuild apps/desktop/src/preload/preload.ts --bundle --platform=node --target=node20 --outfile=apps/desktop/dist/preload/preload.js --external:electron",
     "build:all": "npm run build:web && npm run build:desktop",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
