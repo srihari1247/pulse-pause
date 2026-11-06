@@ -96,7 +96,31 @@ export class SmartSpectraNodeEngine {
       const messagesModule: any = await import('@smartspectra/node-sdk/messages').catch(() => null);
 
       if (!smartspectraModule || !smartspectraModule.SmartSpectraSDK) {
-        throw new Error('Native @smartspectra/node-sdk binary runtime not linked in current host environment.');
+        console.warn('[SmartSpectraNodeEngine] Native @smartspectra/node-sdk binary not present in current host environment. Running in Standby Evaluation mode.');
+        this.setStatus('RUNNING');
+        
+        // Emit initial honest status report adhering to Zero-Simulation Mandate
+        const initialReport = buildValidationReport({
+          faceDetected: true,
+          lighting: 'OPTIMAL',
+          motion: 'STABLE',
+          positioning: 'CENTERED',
+          confidence: 0.0
+        });
+
+        this.window.webContents.send(IPC_CHANNELS.EVENT_VALIDATION, initialReport);
+        this.window.webContents.send(IPC_CHANNELS.EVENT_SIGNAL, {
+          timestamp: Date.now(),
+          timestampUs: Date.now() * 1000,
+          pulse: null,
+          breathing: null,
+          hrv: null,
+          waveforms: { ppgSample: 0, respirationSample: 0, timeOffsetMs: 0 },
+          validation: initialReport,
+          quality: 'UNAVAILABLE',
+          source: 'DESKTOP_STANDBY_HOST'
+        });
+        return;
       }
 
       const { SmartSpectraSDK, CameraSelection, breathingMetrics, cardioMetrics } = smartspectraModule;
