@@ -119,6 +119,7 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
 
   const startBrowserCamera = async (deviceId?: string) => {
     try {
+      setCameraError(null);
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((t) => t.stop());
@@ -130,11 +131,17 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Auto-play issue, playing muted:', playErr);
+        }
         setStreamActive(true);
       }
-    } catch {
-      // If web camera not available or running in pure SDK preview mode
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Camera stream error:', err);
+      setCameraError(`Camera access: ${msg}. Please ensure your browser has camera permission.`);
       setStreamActive(false);
     }
   };
@@ -261,20 +268,24 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
         {/* Camera Viewport with Optical Reticle (7 cols) */}
         <div className="lg:col-span-7 rounded-3xl border border-white/[0.08] bg-slate-900/60 p-4 sm:p-6 backdrop-blur-xl space-y-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/[0.06] bg-[#050811] flex items-center justify-center">
+            {/* Always mounted video element so videoRef.current is ready immediately */}
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              muted
+              className={`h-full w-full object-cover transform -scale-x-100 ${
+                streamActive && !sdkPreviewFrame?.dataUrl ? 'block' : 'hidden'
+              }`}
+            />
+
             {sdkPreviewFrame?.dataUrl ? (
               <img
                 src={sdkPreviewFrame.dataUrl}
                 alt="SmartSpectra Native Camera Preview"
                 className="h-full w-full object-cover transform -scale-x-100"
               />
-            ) : streamActive ? (
-              <video
-                ref={videoRef}
-                playsInline
-                muted
-                className="h-full w-full object-cover transform -scale-x-100"
-              />
-            ) : (
+            ) : !streamActive ? (
               <div className="text-center p-8 space-y-4">
                 <div className="h-12 w-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-sky-400 mx-auto">
                   <Camera className="h-6 w-6" />
@@ -287,13 +298,13 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
                 </div>
                 <button
                   onClick={handleStartSensing}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white px-5 py-2.5 text-xs font-semibold shadow-lg shadow-sky-950/40 transition-all active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white px-5 py-2.5 text-xs font-semibold shadow-lg shadow-sky-950/40 transition-all active:scale-95 cursor-pointer"
                 >
                   <Camera className="h-4 w-4" />
                   <span>Request Camera Permission & Start</span>
                 </button>
               </div>
-            )}
+            ) : null}
 
             {/* Optical Alignment Reticle Overlay */}
             {(streamActive || sdkPreviewFrame) && (
