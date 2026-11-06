@@ -55,9 +55,9 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
-        '@pulsepause/domain-models': path.resolve(__dirname, 'packages/domain-models/src'),
-        '@pulsepause/shared-contracts': path.resolve(__dirname, 'packages/shared-contracts/src'),
-        '@pulsepause/design-system': path.resolve(__dirname, 'packages/design-system/src'),
+        '@pulsepause/domain-models': path.resolve(__dirname, 'packages/domain-models/src/index.ts'),
+        '@pulsepause/shared-contracts': path.resolve(__dirname, 'packages/shared-contracts/src/index.ts'),
+        '@pulsepause/design-system': path.resolve(__dirname, 'packages/design-system/src/index.ts'),
         '@web': path.resolve(__dirname, 'apps/web/src')
       }
     },
