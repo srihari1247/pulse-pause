@@ -26,6 +26,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Diagnostics & Error Capture -->
+    <script>
+      window.addEventListener('error', function(event) {
+        var root = document.getElementById('root');
+        if (root && (!root.children || root.children.length === 0)) {
+          root.innerHTML = '<div style="background:#0f172a;color:#ef4444;padding:2rem;margin:2rem;border-radius:12px;border:1px solid rgba(239,68,68,0.4);font-family:sans-serif;max-width:600px;">' +
+            '<h2 style="margin-top:0;font-size:1.25rem;">Application Startup Exception</h2>' +
+            '<p style="color:#94a3b8;font-size:0.9rem;">' + (event.message || 'Script execution error') + '</p>' +
+            '<pre style="background:#070b14;color:#fca5a5;padding:10px;border-radius:6px;font-size:0.8rem;overflow-x:auto;">' + (event.filename || 'module') + ':' + (event.lineno || 0) + '</pre>' +
+            '<button onclick="location.reload()" style="background:#0284c7;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;margin-top:1rem;">Reload Application</button>' +
+            '</div>';
+        }
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        var root = document.getElementById('root');
+        if (root && (!root.children || root.children.length === 0)) {
+          var msg = event.reason ? (event.reason.message || String(event.reason)) : 'Unhandled rejection';
+          root.innerHTML = '<div style="background:#0f172a;color:#ef4444;padding:2rem;margin:2rem;border-radius:12px;border:1px solid rgba(239,68,68,0.4);font-family:sans-serif;max-width:600px;">' +
+            '<h2 style="margin-top:0;font-size:1.25rem;">Startup Promise Exception</h2>' +
+            '<p style="color:#94a3b8;font-size:0.9rem;">' + msg + '</p>' +
+            '<button onclick="location.reload()" style="background:#0284c7;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;margin-top:1rem;">Reload Application</button>' +
+            '</div>';
+        }
+      });
+    </script>
   </head>
   <body class="bg-[#070b14] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-white">
     <div id="root"></div>
