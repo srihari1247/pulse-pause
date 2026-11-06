@@ -124,11 +124,17 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((t) => t.stop());
       }
-      const constraints: MediaStreamConstraints = {
-        video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      
+      // Use clean constraints that work across all desktop and mobile webcams
+      const videoConstraints: MediaTrackConstraints = deviceId && !deviceId.startsWith('webcam-')
+        ? { deviceId: { ideal: deviceId } }
+        : { facingMode: 'user' };
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraints,
         audio: false
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      });
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         try {
@@ -141,7 +147,7 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('Camera stream error:', err);
-      setCameraError(`Camera access: ${msg}. Please ensure your browser has camera permission.`);
+      setCameraError(`Camera access: ${msg}. Please check browser camera permissions.`);
       setStreamActive(false);
     }
   };
