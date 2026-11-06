@@ -26,7 +26,7 @@ export class IndexedDbStorage {
       return Promise.resolve(null);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -50,9 +50,13 @@ export class IndexedDbStorage {
         };
 
         request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        request.onerror = (err) => {
+          console.warn('[PulsePause Storage] IndexedDB initialization error, falling back to memory storage:', err);
+          resolve(null);
+        };
       } catch (err) {
-        reject(err);
+        console.warn('[PulsePause Storage] IndexedDB open error, falling back to memory storage:', err);
+        resolve(null);
       }
     });
   }
