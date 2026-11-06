@@ -143,6 +143,7 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
           console.warn('Auto-play issue, playing muted:', playErr);
         }
         setStreamActive(true);
+        signalProvider.attachVideoElement(videoRef.current);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -153,6 +154,7 @@ export const LiveSensingScreen: React.FC<LiveSensingScreenProps> = ({
   };
 
   const stopBrowserCamera = () => {
+    signalProvider.attachVideoElement(null);
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((t) => t.stop());
