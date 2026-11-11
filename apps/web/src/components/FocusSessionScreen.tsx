@@ -103,6 +103,7 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
 
   // Signal availability tracking
   const [validSignalSeconds, setValidSignalSeconds] = useState<number>(0);
+  const [showCameraPreview, setShowCameraPreview] = useState<boolean>(true);
 
   // Optional Guided Breathing Companion
   const [breathingOpen, setBreathingOpen] = useState<boolean>(false);
@@ -118,10 +119,13 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
   const remainingSeconds = Math.max(0, totalTargetSeconds - elapsedSeconds);
   const progressPercent = Math.min(100, (elapsedSeconds / totalTargetSeconds) * 100);
 
+  const liveSignalRef = useRef<HumanSignal | null>(null);
+
   // Subscribe to Live SmartSpectra HumanSignalProvider
   useEffect(() => {
     const unsub = signalProvider.onSignal((signal) => {
       setLiveSignal(signal);
+      liveSignalRef.current = signal;
     });
     return () => unsub();
   }, []);
@@ -133,12 +137,13 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
       timer = setInterval(() => {
         setElapsedSeconds((prev) => {
           const nextSec = prev + 1;
+          const currentSig = liveSignalRef.current;
 
           // Check if current optical signal is reliable
           const isSignalReliable =
-            liveSignal?.pulse?.isReliable === true ||
-            liveSignal?.quality === 'OPTIMAL' ||
-            liveSignal?.quality === 'DEGRADED';
+            currentSig?.pulse?.isReliable === true ||
+            currentSig?.quality === 'OPTIMAL' ||
+            currentSig?.quality === 'DEGRADED';
 
           if (isSignalReliable) {
             setValidSignalSeconds((vs) => vs + 1);
@@ -155,8 +160,8 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
               {
                 timeStr: timeLabel,
                 seconds: nextSec,
-                pulse: liveSignal?.pulse?.isReliable ? Math.round(liveSignal.pulse.bpm) : null,
-                breathing: liveSignal?.breathing?.isReliable ? Number(liveSignal.breathing.brpm.toFixed(1)) : null,
+                pulse: currentSig?.pulse?.isReliable ? Math.round(currentSig.pulse.bpm) : null,
+                breathing: currentSig?.breathing?.isReliable ? Number(currentSig.breathing.brpm.toFixed(1)) : null,
                 isReliable: isSignalReliable
               }
             ]);
@@ -175,8 +180,10 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
         }
       }, 1000);
     }
-    return () => clearInterval(timer);
-  }, [sessionStatus, totalTargetSeconds, liveSignal, breathingOpen]);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [sessionStatus, totalTargetSeconds, breathingOpen]);
 
   // Optional Guided Breathing Animation Loop
   useEffect(() => {
@@ -247,8 +254,54 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
     return () => cancelAnimationFrame(animFrame);
   }, [sessionStatus, breathingOpen, selectedPattern, audioChimes]);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [cameraActive, setCameraActive] = useState<boolean>(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  const startFocusCamera = async () => {
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Focus camera autoplay muted:', playErr);
+        }
+        setCameraActive(true);
+        signalProvider.attachVideoElement(videoRef.current);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn('Focus camera stream error:', msg);
+      setCameraError(`Camera not accessible: ${msg}`);
+      setCameraActive(false);
+    }
+  };
+
+  const stopFocusCamera = () => {
+    signalProvider.attachVideoElement(null);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((t) => t.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopFocusCamera();
+    };
+  }, []);
+
   const handleStartSession = async () => {
     try {
+      await startFocusCamera();
       if (signalProvider.getStatus() === 'IDLE') {
         await signalProvider.start();
       }
@@ -269,6 +322,7 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
   };
 
   const handleStopSession = async () => {
+    stopFocusCamera();
     await signalProvider.stop();
     setSessionStatus('IDLE');
     setElapsedSeconds(0);
@@ -276,6 +330,7 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
   };
 
   const handleCompleteSession = async (finalElapsed = elapsedSeconds) => {
+    stopFocusCamera();
     setSessionStatus('IDLE');
     await signalProvider.stop();
 
@@ -395,6 +450,62 @@ export const FocusSessionScreen: React.FC<FocusSessionScreenProps> = ({
       {/* Main Focus Clock & Visual Experience */}
       <div className="rounded-3xl border border-white/[0.08] bg-gradient-to-b from-slate-900/60 via-[#0a0f1d] to-[#070b14] p-6 sm:p-10 backdrop-blur-2xl shadow-2xl relative overflow-hidden space-y-8">
         <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-sky-500/10 blur-[100px]" />
+
+        {/* Mounted video element and toggleable Picture-in-Picture camera preview */}
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          {cameraActive ? (
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-950/40 px-3 py-1 text-[11px] font-mono text-sky-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Camera Tracking Active</span>
+              </div>
+              <button
+                onClick={() => setShowCameraPreview((p) => !p)}
+                className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors font-mono cursor-pointer"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                <span>{showCameraPreview ? 'Hide Camera' : 'Show Camera'}</span>
+              </button>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {/* Picture-in-Picture Camera Viewport with always-mounted video */}
+          <div
+            className={`relative h-24 w-36 overflow-hidden rounded-2xl border border-sky-500/30 bg-slate-950 shadow-lg ${
+              cameraActive && showCameraPreview ? 'block' : 'hidden'
+            }`}
+          >
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              muted
+              className="h-full w-full object-cover transform -scale-x-100"
+            />
+            {/* Subtle Alignment Reticle */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="h-[75%] w-[60%] rounded-full border border-dashed border-sky-400/50" />
+            </div>
+            <span className="absolute bottom-1 right-1.5 rounded bg-black/60 px-1 font-mono text-[9px] text-slate-400">
+              Live ROI
+            </span>
+          </div>
+        </div>
+
+        {/* Camera Permission Alert (If denied by browser) */}
+        {cameraError && (
+          <div className="relative z-10 rounded-2xl border border-rose-500/40 bg-rose-950/30 p-3.5 text-xs text-rose-300 flex items-center gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-rose-400 shrink-0" />
+            <div className="space-y-0.5">
+              <span className="font-semibold block">{cameraError}</span>
+              <span className="text-[11px] text-rose-200/80 block">
+                Tap the lock/camera icon in your address bar, set Camera to "Allow", and restart the session.
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Top Telemetry & Signal Availability Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 relative z-10">

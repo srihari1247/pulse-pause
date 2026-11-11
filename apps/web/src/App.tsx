@@ -7,6 +7,7 @@ import { FocusSessionScreen } from './components/FocusSessionScreen';
 import { BreathingScreen } from './components/BreathingScreen';
 import { SessionSummaryScreen } from './components/SessionSummaryScreen';
 import { SettingsPrivacyScreen } from './components/SettingsPrivacyScreen';
+import { HelpGuideScreen } from './components/HelpGuideScreen';
 import { bridgeClient } from './bridge/bridgeClient';
 import { storage } from './storage/indexedDb';
 import {
@@ -150,6 +151,12 @@ export function PulsePauseWebApp() {
             onHistoryCleared={() => refreshSessions()}
           />
         )}
+
+        {currentScreen === 'help' && (
+          <HelpGuideScreen
+            onNavigate={(screen) => setCurrentScreen(screen)}
+          />
+        )}
       </main>
 
       {/* Clean, Restrained Footer */}
@@ -162,6 +169,13 @@ export function PulsePauseWebApp() {
           </div>
 
           <div className="flex items-center gap-6">
+            <button
+              onClick={() => setCurrentScreen('help')}
+              className="text-sky-400 hover:text-sky-300 font-semibold transition-colors"
+            >
+              How to Use (Help)
+            </button>
+            <span>·</span>
             <button
               onClick={() => setCurrentScreen('settings')}
               className="hover:text-slate-300 transition-colors"

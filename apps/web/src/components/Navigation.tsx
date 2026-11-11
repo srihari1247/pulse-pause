@@ -8,11 +8,12 @@ import {
   Wind,
   Camera,
   BarChart3,
-  ShieldCheck
+  ShieldCheck,
+  HelpCircle
 } from 'lucide-react';
 import { PWAInstallButton } from './pwa/PWAInstallButton';
 
-export type ScreenId = 'landing' | 'dashboard' | 'sensing' | 'focus' | 'breathing' | 'summary' | 'settings';
+export type ScreenId = 'landing' | 'dashboard' | 'sensing' | 'focus' | 'breathing' | 'summary' | 'settings' | 'help';
 
 interface NavigationProps {
   currentScreen: ScreenId;
@@ -32,7 +33,8 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'focus', label: 'Focus', icon: Clock },
     { id: 'breathing', label: 'Breathing', icon: Wind },
     { id: 'sensing', label: 'Live Sensing', icon: Camera },
-    { id: 'summary', label: 'Summary', icon: BarChart3 }
+    { id: 'summary', label: 'Summary', icon: BarChart3 },
+    { id: 'help', label: 'Help Guide', icon: HelpCircle }
   ];
 
   const triggerHaptic = () => {
