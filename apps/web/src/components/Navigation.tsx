@@ -62,7 +62,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => handleLinkClick('landing')}
-              className="flex items-center gap-2.5 text-left group transition-transform active:scale-[0.98]"
+              className="flex items-center gap-2.5 text-left group transition-transform active:scale-[0.98] cursor-pointer"
             >
               <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-violet-500 p-[1px] shadow-lg shadow-sky-500/20">
                 <div className="h-full w-full rounded-[11px] bg-[#070b14] flex items-center justify-center">
@@ -70,7 +70,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-base sm:text-lg font-bold tracking-tight text-white font-sans whitespace-nowrap">
+                <span className="text-base sm:text-lg font-extrabold tracking-tight text-white font-display whitespace-nowrap">
                   PulsePause
                 </span>
               </div>
@@ -78,28 +78,28 @@ export const Navigation: React.FC<NavigationProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-slate-400">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs tracking-wide uppercase font-medium text-slate-400">
             {navLinks.map((link) => {
               const isActive = currentScreen === link.id;
               return (
                 <button
                   key={link.id}
                   onClick={() => handleLinkClick(link.id)}
-                  className={`relative py-1 transition-colors whitespace-nowrap shrink-0 hover:text-white ${
-                    isActive ? 'text-white font-semibold' : 'text-slate-400'
+                  className={`relative py-1 transition-colors whitespace-nowrap shrink-0 hover:text-white cursor-pointer ${
+                    isActive ? 'text-white font-bold' : 'text-slate-400'
                   }`}
                 >
                   <span>{link.label}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-400 to-violet-400 rounded-full" />
+                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400 rounded-full" />
                   )}
                 </button>
               );
             })}
             <button
               onClick={() => handleLinkClick('settings')}
-              className={`relative py-1 transition-colors whitespace-nowrap shrink-0 hover:text-white ${
-                currentScreen === 'settings' ? 'text-white font-semibold' : 'text-slate-400'
+              className={`relative py-1 transition-colors whitespace-nowrap shrink-0 hover:text-white cursor-pointer ${
+                currentScreen === 'settings' ? 'text-white font-bold' : 'text-slate-400'
               }`}
             >
               Settings

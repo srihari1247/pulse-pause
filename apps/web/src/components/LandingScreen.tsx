@@ -23,7 +23,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({ onNavigate }) => {
           </div>
 
           {/* Main Display Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] font-sans">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.18] font-display">
             Breathe with your pulse. <br />
             <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">
               Master your cognitive flow.

@@ -60,20 +60,23 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate, re
   return (
     <div className="space-y-8 py-4">
       {/* Top Greeting & Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.05] pb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <span className="text-[11px] font-mono uppercase tracking-widest text-sky-400 font-semibold block mb-1">
+            Human-Sensing Wellness & Focus Guardian
+          </span>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-display">
             {getGreeting()}, Srihari
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Presage SmartSpectra optical sensors stand by. Ready for your 25-minute focus session?
+            Presage SmartSpectra optical sensors stand by. Ready for your focused flow session?
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => onNavigate('focus')}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white px-4 py-2.5 text-xs font-semibold shadow-lg shadow-sky-950/40 transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white px-5 py-2.5 text-xs font-semibold shadow-lg shadow-sky-950/40 transition-all active:scale-[0.98] cursor-pointer"
           >
             <Play className="h-3.5 w-3.5 fill-white" />
             <span>Start Focus Session</span>
@@ -81,10 +84,10 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate, re
 
           <button
             onClick={() => onNavigate('breathing')}
-            className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-white px-4 py-2.5 text-xs font-semibold transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-white px-4 py-2.5 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
           >
             <Wind className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Quick Breathe</span>
+            <span>Guided Breath</span>
           </button>
         </div>
       </div>
